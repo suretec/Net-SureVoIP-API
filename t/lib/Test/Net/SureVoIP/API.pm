@@ -24,4 +24,12 @@ sub fixtures :Tests(startup => 2) {
   isa_ok $test->{api} , 'Net::SureVoIP::API';
 }
 
+sub ip_address :Tests(1) {
+  my $test = shift;
+
+  my $resp = $test->{api}->ip_address;
+
+  like( $resp->{content} , qr/"ip-address":"[0-9.]+"/ , 'looks like an IP');
+}
+
 1;

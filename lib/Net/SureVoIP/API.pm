@@ -129,7 +129,17 @@ sub sms_details {}
 
 =cut
 
-sub ip_address {}
+sub ip_address {
+  my $client = Net::SureVoIP::API::Client->new;
+
+  my $response = $client->get('https://api.surevoip.co.uk/support/ip-address');
+  if ( $response->{success} ) {
+    return $response;
+  }
+  else {
+    Net::SureVoIP::API::Exception::Http->throw( $response );
+  }
+}
 
 =method service_status
 
