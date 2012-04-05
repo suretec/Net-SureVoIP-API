@@ -32,4 +32,12 @@ sub ip_address :Tests(1) {
   like( $resp->{content} , qr/"ip-address":"[0-9.]+"/ , 'looks like an IP');
 }
 
+sub service_status :Tests() {
+  my $test = shift;
+
+  my $resp = $test->{api}->service_status;
+
+  like( $resp->{content} , qr/"entries":/ , 'has entries' );
+}
+
 1;

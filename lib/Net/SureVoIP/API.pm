@@ -145,7 +145,17 @@ sub ip_address {
 
 =cut
 
-sub service_status {}
+sub service_status {
+  my $client = Net::SureVoIP::API::Client->new;
+
+  my $response = $client->get('https://api.surevoip.co.uk/support/service-status');
+  if ( $response->{success} ) {
+    return $response;
+  }
+  else {
+    Net::SureVoIP::API::Exception::Http->throw( $response );
+  }
+}
 
 =method sip
 
