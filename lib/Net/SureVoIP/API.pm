@@ -2,6 +2,63 @@ package Net::SureVoIP::API;
 # ABSTRACT: Perl library for SureVoIP REST API
 use Moose;
 
+use MIME::Base64;
+use Net::SureVoIP::API::Client;
+use Net::SureVoIP::API::Exception::Http;
+use Net::SureVoIP::API::Exception::Init;
+
+sub BUILDARGS {
+  my $class = shift;
+
+  my %args = ref $_[0] ? %{ $_[0] } : @_;
+
+  if ( $args{basic_auth} ) {
+    my $user = $args{basic_auth}{username}
+      // Net::SureVoIP::API::Exception::Init->throw( ident => 'basic_auth needs username' );
+
+    my $pass = $args{basic_auth}{password}
+      // Net::SureVoIP::API::Exception::Init->throw( ident => 'basic_auth needs password' );
+
+    $args{default_headers}{Authorization} = 'Basic ' . encode_base64("$user:$pass");
+  }
+  ### TODO OAuth....
+  # elsif ( $args{oauth} ) { ... }
+  else {
+    Net::SureVoIP::API::Exception::Init->throw(
+      ident => 'Must supply authentication credentials.'
+    );
+  }
+
+  return \%args;
+}
+
+=attr default_headers
+
+=cut
+
+has base_url => (
+  is      => 'ro' ,
+  isa     => 'Str' ,
+  default => 'https://api.surevoip.co.uk/' ,
+);
+
+has default_headers => (
+  is  => 'ro',
+  isa => 'HashRef' ,
+);
+
+has _user_agent => (
+  is         => 'ro' ,
+  isa        => 'Net::SureVoIP::API::Client' ,
+  init_arg   => '_inject_user_agent' ,
+  lazy_build => 1 ,
+  handles    => [ qw/ get head post put delete options / ],
+);
+
+sub _build__user_agent {
+  return Net::SureVoIP::API::Client->new( default_headers => shift->default_headers );
+}
+
 =method create_customer
 
 =cut
