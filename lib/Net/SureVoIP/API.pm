@@ -2,6 +2,7 @@ package Net::SureVoIP::API;
 # ABSTRACT: Perl library for SureVoIP REST API
 use Moose;
 
+use JSON;
 use MIME::Base64;
 use Net::SureVoIP::API::Client;
 use Net::SureVoIP::API::Exception::Http;
@@ -41,6 +42,36 @@ has base_url => (
   isa     => 'Str' ,
   default => 'https://api.surevoip.co.uk/' ,
 );
+
+has customer_number => (
+  is         => 'ro' ,
+  isa        => 'Str' ,
+  lazy_build => 1 ,
+);
+
+sub _build_customer_number {
+  my $self = shift;
+
+  my $url  = $self->base_url . 'customers/';
+  my $resp = $self->get( $url );
+
+  if ( $resp->{status} == '302' ) {
+    my $obj = decode_json( $resp->{content} );
+
+    my $location = $obj->{location}
+      or Net::SureVoIP::API::Exception::Http->throw({
+        ident => "Location not found in response content:\n" . $resp->{content}
+      });
+
+    my( $number ) = $location =~ m|^$url(.*)$|
+      or Net::SureVoIP::API::Exception::Parse->throw({
+        ident => "Unable to parse customer number from $location" ,
+      });
+
+    return $number;
+  }
+  else { Net::SureVoIP::API::Exception::Http->throw( $resp ) }
+}
 
 has default_headers => (
   is  => 'ro',

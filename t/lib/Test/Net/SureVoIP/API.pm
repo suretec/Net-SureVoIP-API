@@ -24,6 +24,14 @@ sub fixtures :Tests(startup => 2) {
   isa_ok $test->{api} , 'Net::SureVoIP::API';
 }
 
+sub customer_number :Tests() {
+  my $test = shift;
+
+  my $number = $test->{api}->customer_number;
+
+  ok( $number , 'got a response' );
+}
+
 sub ip_address :Tests(1) {
   my $test = shift;
 
