@@ -22,6 +22,8 @@ sub fixtures :Tests(startup => 2) {
     },
   });
   isa_ok $test->{api} , 'Net::SureVoIP::API';
+
+  ### TODO have distinct clients for 'customer' access and 'partner' access.
 }
 
 sub customer :Tests() {
