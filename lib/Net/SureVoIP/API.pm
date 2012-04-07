@@ -34,15 +34,23 @@ sub BUILDARGS {
   return \%args;
 }
 
-=attr default_headers
+=attr base_url
 
 =cut
 
 has base_url => (
-  is      => 'ro' ,
-  isa     => 'Str' ,
-  default => 'https://api.surevoip.co.uk/' ,
+  is         => 'ro' ,
+  isa        => 'Str' ,
+  lazy_build => 1 ,
 );
+
+sub _build_base_url {
+  my $self = shift;
+
+  my $base_base = 'https://api.surevoip.co.uk';
+
+  return $self->partner_name ? "$base_base/partners/" . $self->partner_name : $base_base;
+}
 
 has customer_number => (
   is         => 'ro' ,
@@ -53,7 +61,12 @@ has customer_number => (
 sub _build_customer_number {
   my $self = shift;
 
-  my $url  = $self->base_url . 'customers/';
+  Net::SureVoIP::API::Exception::Init->throw({
+    ident => 'Partners must supply customer number' ,
+  })
+      if $self->has_partner_name;
+
+  my $url  = $self->base_url . '/customers';
   my $resp = $self->get( $url );
 
   if ( $resp->{status} == '302' ) {
@@ -64,7 +77,7 @@ sub _build_customer_number {
         ident => "Location not found in response content:\n" . $resp->{content}
       });
 
-    my( $number ) = $location =~ m|^$url(.*)$|
+    my( $number ) = $location =~ m|^$url/(.*)$|
       or Net::SureVoIP::API::Exception::Parse->throw({
         ident => "Unable to parse customer number from $location" ,
       });
