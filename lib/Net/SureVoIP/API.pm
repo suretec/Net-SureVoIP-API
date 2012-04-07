@@ -79,6 +79,16 @@ has default_headers => (
   isa => 'HashRef' ,
 );
 
+=attr partner_name
+
+=cut
+
+has partner_name => (
+  is        => 'ro' ,
+  isa       => 'Str' ,
+  predicate => 'has_partner_name' ,
+);
+
 has _user_agent => (
   is         => 'ro' ,
   isa        => 'Net::SureVoIP::API::Client' ,
