@@ -16,19 +16,17 @@ sub BUILDARGS {
 
   if ( $args{basic_auth} ) {
     my $user = $args{basic_auth}{username}
-      // Net::SureVoIP::API::Exception::Init->throw( ident => 'basic_auth needs username' );
+      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs username' );
 
     my $pass = $args{basic_auth}{password}
-      // Net::SureVoIP::API::Exception::Init->throw( ident => 'basic_auth needs password' );
+      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs password' );
 
     $args{default_headers}{Authorization} = 'Basic ' . encode_base64("$user:$pass");
   }
   ### TODO OAuth....
   # elsif ( $args{oauth} ) { ... }
   else {
-    Net::SureVoIP::API::Exception::Init->throw(
-      ident => 'Must supply authentication credentials.'
-    );
+    Net::SureVoIP::API::Exception::Init->throw( 'Must supply authentication credentials.' );
   }
 
   return \%args;
@@ -65,9 +63,7 @@ has customer_number => (
 sub _build_customer_number {
   my $self = shift;
 
-  Net::SureVoIP::API::Exception::Init->throw({
-    ident => 'Partners must supply customer number' ,
-  })
+  Net::SureVoIP::API::Exception::Init->throw( 'Partners must supply customer number' )
       if $self->has_partner_name;
 
   my $url  = $self->base_url . '/customers';
@@ -77,14 +73,14 @@ sub _build_customer_number {
     my $obj = decode_json( $resp->{content} );
 
     my $location = $obj->{location}
-      or Net::SureVoIP::API::Exception::Http->throw({
-        ident => "Location not found in response content:\n" . $resp->{content}
-      });
+      or Net::SureVoIP::API::Exception::Http->throw(
+        "Location not found in response content:\n" . $resp->{content}
+      );
 
     my( $number ) = $location =~ m|^$url/(.*)$|
-      or Net::SureVoIP::API::Exception::Parse->throw({
-        ident => "Unable to parse customer number from $location" ,
-      });
+      or Net::SureVoIP::API::Exception::Parse->throw(
+        "Unable to parse customer number from $location"
+      );
 
     return $number;
   }

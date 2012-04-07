@@ -14,8 +14,13 @@ sub BUILDARGS {
   if ( @_ == 1 ) {
     my $error = shift;
 
-    my $ident = ( ref $error and $error->{content} ) ? $error->{content}
-      : 'Unable to parse returned error';
+    my $ident;
+
+    if ( ref $error ) {
+      if ( $error->{content} ) { $ident = $error->{content} }
+      else { $ident = 'Unable to parse returned error' }
+    }
+    else { $ident = $error }
 
     %args = ( ident => $ident );
   }
