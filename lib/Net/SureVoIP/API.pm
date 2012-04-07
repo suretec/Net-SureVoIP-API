@@ -52,6 +52,10 @@ sub _build_base_url {
   return $self->partner_name ? "$base_base/partners/" . $self->partner_name : $base_base;
 }
 
+=attr customer_number
+
+=cut
+
 has customer_number => (
   is         => 'ro' ,
   isa        => 'Str' ,
@@ -86,6 +90,10 @@ sub _build_customer_number {
   }
   else { Net::SureVoIP::API::Exception::Http->throw( $resp ) }
 }
+
+=attr default_headers
+
+=cut
 
 has default_headers => (
   is  => 'ro',
