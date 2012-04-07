@@ -7,6 +7,7 @@ use MIME::Base64;
 use Net::SureVoIP::API::Client;
 use Net::SureVoIP::API::Exception::Http;
 use Net::SureVoIP::API::Exception::Init;
+use Net::SureVoIP::API::Response::Customer;
 
 sub BUILDARGS {
   my $class = shift;
@@ -88,6 +89,22 @@ has _user_agent => (
 
 sub _build__user_agent {
   return Net::SureVoIP::API::Client->new( default_headers => shift->default_headers );
+}
+
+=method customer
+
+=cut
+
+sub customer {
+  my $self = shift;
+
+  my $url  = $self->base_url . 'customers/' . $self->customer_number . '&hypermedia=no';
+  my $resp = $self->get( $url );
+
+  return Net::SureVoIP::API::Response::Customer->new( $resp->{content} )
+    if ( $resp->{success} );
+
+  Net::SureVoIP::API::Exception::Http->throw( $resp );
 }
 
 =method create_customer

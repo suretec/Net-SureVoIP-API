@@ -24,6 +24,14 @@ sub fixtures :Tests(startup => 2) {
   isa_ok $test->{api} , 'Net::SureVoIP::API';
 }
 
+sub customer :Tests() {
+  my $test = shift;
+
+  my $customer = $test->{api}->customer;
+
+  isa_ok( $customer , 'Net::SureVoIP::API::Response::Customer' );
+}
+
 sub customer_number :Tests() {
   my $test = shift;
 
