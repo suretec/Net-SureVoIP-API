@@ -121,7 +121,9 @@ sub _build__user_agent {
 sub customer {
   my $self = shift;
 
-  my $url  = $self->base_url . 'customers/' . $self->customer_number . '&hypermedia=no';
+  my $customer_number = shift || $self->customer_number;
+
+  my $url  = $self->base_url . '/customers/' . $customer_number . '&hypermedia=no';
   my $resp = $self->get( $url );
 
   return Net::SureVoIP::API::Response::Customer->new( $resp->{content} )
