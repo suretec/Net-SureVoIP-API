@@ -181,9 +181,22 @@ sub invoice_details {}
 
 =method billing_contact
 
+# optional arg == update
+
 =cut
 
-sub billing_contact {} # optional arg == update
+sub billing_contact {
+  my $self = shift;
+
+  ### TODO handle optional argument here....
+
+  my $url  = $self->_build_customer_url( 'billing/contact' );
+  my $resp = $self->get( $url );
+
+  ### FIXME process response
+
+  return $resp;
+}
 
 =method list_numbers
 

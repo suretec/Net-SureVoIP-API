@@ -26,6 +26,17 @@ sub fixtures :Tests(startup => 2) {
   ### TODO have distinct clients for 'customer' access and 'partner' access.
 }
 
+sub billing_contact :Tests() {
+  my $test = shift;
+
+  my $billing_contact = $test->{api}->billing_contact;
+
+  TODO :{
+    local $TODO = 'Finish billing_contact tests';
+    ok(1);
+  }
+}
+
 sub customer :Tests() {
   my $test = shift;
 
