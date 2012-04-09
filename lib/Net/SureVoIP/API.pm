@@ -118,6 +118,16 @@ sub _build__user_agent {
   return Net::SureVoIP::API::Client->new( default_headers => shift->default_headers );
 }
 
+sub _build_customer_url {
+  my( $self , $path , $number ) = @_;
+
+  $number //= $self->customer_number;
+
+  my $url = join '/' , $self->base_url , 'customers' , $number , $path;
+
+  return $url . '?hypermedia=no';
+}
+
 =method customer
 
 =cut
@@ -127,7 +137,7 @@ sub customer {
 
   my $customer_number = shift || $self->customer_number;
 
-  my $url  = $self->base_url . '/customers/' . $customer_number . '&hypermedia=no';
+  my $url  = $self->_build_customer_url( '' , $customer_number );
   my $resp = $self->get( $url );
 
   return Net::SureVoIP::API::Response::Customer->new( $resp->{content} )
