@@ -50,6 +50,15 @@ sub ip_address :Tests(1) {
   like( $resp->{content} , qr/"ip-address":"[0-9.]+"/ , 'looks like an IP');
 }
 
+sub list_invoices :Tests() {
+  my $test = shift;
+
+ TODO: {
+    local $TODO = 'Finish list_invoices tests';
+    ok(1);
+  }
+}
+
 sub service_status :Tests() {
   my $test = shift;
 

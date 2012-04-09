@@ -162,7 +162,16 @@ sub list_calls {}
 
 =cut
 
-sub list_invoices {}
+sub list_invoices {
+  my $self = shift;
+
+  my $url  = $self->_build_customer_url( 'billing/invoices' );
+  my $resp = $self->get( $url );
+
+  ### FIXME process response
+
+  return $resp;
+}
 
 =method invoice_details
 
