@@ -4,33 +4,9 @@ use Moose;
 
 use JSON;
 use MIME::Base64;
-use Net::SureVoIP::API::Client;
 use Net::SureVoIP::API::Exception::Http;
 use Net::SureVoIP::API::Exception::Init;
 use Net::SureVoIP::API::Response::Customer;
-
-sub BUILDARGS {
-  my $class = shift;
-
-  my %args = ref $_[0] ? %{ $_[0] } : @_;
-
-  if ( $args{basic_auth} ) {
-    my $user = $args{basic_auth}{username}
-      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs username' );
-
-    my $pass = $args{basic_auth}{password}
-      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs password' );
-
-    $args{default_headers}{Authorization} = 'Basic ' . encode_base64("$user:$pass");
-  }
-  ### TODO OAuth....
-  # elsif ( $args{oauth} ) { ... }
-  else {
-    Net::SureVoIP::API::Exception::Init->throw( 'Must supply authentication credentials.' );
-  }
-
-  return \%args;
-}
 
 =attr base_url
 
@@ -50,42 +26,17 @@ sub _build_base_url {
   return $self->partner_name ? "$base_base/partners/" . $self->partner_name : $base_base;
 }
 
-=attr customer_number
+=attr debug
+
+### FIXME POD
 
 =cut
 
-has customer_number => (
-  is         => 'ro' ,
-  isa        => 'Str' ,
-  lazy_build => 1 ,
+has debug => (
+  is      => 'ro' ,
+  isa     => 'Bool' ,
+  default => 0 ,
 );
-
-sub _build_customer_number {
-  my $self = shift;
-
-  Net::SureVoIP::API::Exception::Init->throw( 'Partners must supply customer number' )
-      if $self->has_partner_name;
-
-  my $url  = $self->base_url . '/customers';
-  my $resp = $self->get( $url );
-
-  if ( $resp->{status} == '302' ) {
-    my $obj = decode_json( $resp->{content} );
-
-    my $location = $obj->{location}
-      or Net::SureVoIP::API::Exception::Http->throw(
-        "Location not found in response content:\n" . $resp->{content}
-      );
-
-    my( $number ) = $location =~ m|^$url/(.*)$|
-      or Net::SureVoIP::API::Exception::Parse->throw(
-        "Unable to parse customer number from $location"
-      );
-
-    return $number;
-  }
-  else { Net::SureVoIP::API::Exception::Http->throw( $resp ) }
-}
 
 =attr default_headers
 
@@ -94,6 +45,18 @@ sub _build_customer_number {
 has default_headers => (
   is  => 'ro',
   isa => 'HashRef' ,
+);
+
+=attr default_response_handler
+
+### FIXME POD
+
+=cut
+
+has default_response_handler => (
+  is      => 'ro' ,
+  isa     => 'Str' ,
+  default => 'Net::SureVoIP::API::Response' ,
 );
 
 =attr partner_name
@@ -106,225 +69,88 @@ has partner_name => (
   predicate => 'has_partner_name' ,
 );
 
-has _user_agent => (
-  is         => 'ro' ,
-  isa        => 'Net::SureVoIP::API::Client' ,
-  init_arg   => '_inject_user_agent' ,
-  lazy_build => 1 ,
-  handles    => [ qw/ get head post put delete options / ],
-);
+# load this down here because some required methods are satisfied by
+# attribute accessors and we have to generate them first...
+with 'Role::REST::Client' => {
+  commands => {
+    ### FIXME need to fill in the rest of this
+    #   create_customer => {
+    #     method => 'POST' ,
+    #   },
+    #    list_calls => {},
+    list_invoices => {
+      path => 'customers/%{key}s/billing/invoices' ,
+    },
+    #    get_invoice => {
+    #      path  => 'customers/%{key}s/billing/invoices/%{id}s' ,
+    #      alias => 'invoice_details'
+    #    },
+    #    show_billing_contact => {
+    #      path => 'customers/%{key}s/billing/contact' ,
+    #    } ,
+    #    update_billing_contact => {
+    #      path => 'customers/%{key}s/billing/contact' ,
+    #    } ,
+    #    list_numbers => {} ,
+    #    get_number => {
+    #      alias => 'number_details' ,
+    #    },
+    #    update_number => {} ,
+    #    list_faxes => {} ,
+    #    get_fax => {
+    #      alias => 'fax_details' ,
+    #    },
+    #    list_sms => {} ,
+    #    get_sms => {
+    #      alias => 'sms_details' ,
+    #    },
+    customer => {
+      path     => 'customers/%{key}s' ,
+      response => 'Net::SureVoIP::API::Response::Customer' ,
+    },
+    ip_address => {
+      path => 'support/ip-address' ,
+    },
+    service_status => {
+      path => 'support/service-status' ,
+    },
+    #    sip => {} ,
+    #    numbers => {} ,
+    #    area_codes => {} ,
+    #    create_call => {} ,
+    #    end_call => {} ,
+    #    modify_call => {} ,
+    #    list_customer_stats => {} ,
+    #    get_customer_stats => {} ,
+    #    send_sms => {} ,
+    #    send_fax => {} ,
+  },
+};
 
-sub _build__user_agent {
-  return Net::SureVoIP::API::Client->new( default_headers => shift->default_headers );
-}
+sub BUILDARGS {
+  my $class = shift;
 
-sub _build_customer_url {
-  my( $self , $path , $number ) = @_;
+  my %args = ref $_[0] ? %{ $_[0] } : @_;
 
-  $number //= $self->customer_number;
+  ### FIXME
+  if ( $args{basic_auth} ) {
+    my $user = $args{basic_auth}{username}
+      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs username' );
 
-  my $url = join '/' , $self->base_url , 'customers' , $number , $path;
+    my $pass = $args{basic_auth}{password}
+      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs password' );
 
-  return $url . '?hypermedia=no';
-}
-
-=method customer
-
-=cut
-
-sub customer {
-  my $self = shift;
-
-  my $customer_number = shift || $self->customer_number;
-
-  my $url  = $self->_build_customer_url( '' , $customer_number );
-  my $resp = $self->get( $url );
-
-  return Net::SureVoIP::API::Response::Customer->new( $resp->{content} )
-    if ( $resp->{success} );
-
-  Net::SureVoIP::API::Exception::Http->throw( $resp );
-}
-
-=method create_customer
-
-=cut
-
-sub create_customer {}
-
-=method list_calls
-
-=cut
-
-sub list_calls {}
-
-=method list_invoices
-
-=cut
-
-sub list_invoices {
-  my $self = shift;
-
-  my $url  = $self->_build_customer_url( 'billing/invoices' );
-  my $resp = $self->get( $url );
-
-  ### FIXME process response
-
-  return $resp;
-}
-
-=method invoice_details
-
-=cut
-
-sub invoice_details {}
-
-=method billing_contact
-
-# optional arg == update
-
-=cut
-
-sub billing_contact {
-  my $self = shift;
-
-  ### TODO handle optional argument here....
-
-  my $url  = $self->_build_customer_url( 'billing/contact' );
-  my $resp = $self->get( $url );
-
-  ### FIXME process response
-
-  return $resp;
-}
-
-=method list_numbers
-
-=cut
-
-sub list_numbers {}
-
-=method number_details
-
-=cut
-
-sub number_details {}  # optional arg == update
-
-=method list_faxes
-
-=cut
-
-sub list_faxes {}
-
-=method fax_details
-
-=cut
-
-sub fax_details {}
-
-=method list_sms
-
-=cut
-
-sub list_sms {}
-
-=method sms_details
-
-=cut
-
-sub sms_details {}
-
-=method ip_address
-
-=cut
-
-sub ip_address {
-  my $client = Net::SureVoIP::API::Client->new;
-
-  my $response = $client->get('https://api.surevoip.co.uk/support/ip-address');
-  if ( $response->{success} ) {
-    return $response;
+    $args{default_headers}{Authorization} = 'Basic ' . encode_base64("$user:$pass");
   }
+  ### TODO OAuth....
+  # elsif ( $args{oauth} ) { ... }
   else {
-    Net::SureVoIP::API::Exception::Http->throw( $response );
+    Net::SureVoIP::API::Exception::Init->throw( 'Must supply authentication credentials.' );
   }
+
+  $args{default_headers}{'Content-Type'} = 'application/json';
+
+  return \%args;
 }
 
-=method service_status
-
-=cut
-
-sub service_status {
-  my $client = Net::SureVoIP::API::Client->new;
-
-  my $response = $client->get('https://api.surevoip.co.uk/support/service-status');
-  if ( $response->{success} ) {
-    return $response;
-  }
-  else {
-    Net::SureVoIP::API::Exception::Http->throw( $response );
-  }
-}
-
-=method sip
-
-=cut
-
-sub sip {}
-
-=method numbers
-
-=cut
-
-sub numbers {}      # TODO this section needs a bit of thought
-
-=method area_codes
-
-=cut
-
-sub area_codes {}   # TODO this section needs a bit of thought
-
-=method create_call
-
-=cut
-
-sub create_call {}
-
-=method call_details
-
-=cut
-
-sub call_details {} # optional arg == update
-
-=method end_call
-
-=cut
-
-sub end_call {}
-
-=method list_customer_stats
-
-=cut
-
-sub list_customer_stats {}
-
-=method get_customer_stats
-
-=cut
-
-sub get_customer_stats {}
-
-=method send_sms
-
-=cut
-
-sub send_sms {}
-
-=method =send_fax
-
-=cut
-
-sub send_fax {}
-
-__PACKAGE__->meta->make_immutable;
 1;

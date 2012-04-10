@@ -3,15 +3,20 @@ use Moose;
 
 use JSON;
 
-sub BUILDARGS {
-  my $class = shift;
+has content  => ( is => 'ro' , isa => 'Str'     , required => 1 );
+has headers  => ( is => 'ro' , isa => 'HashRef' , required => 1 );
+has protocol => ( is => 'ro' , isa => 'Str'     , required => 1 );
+has reason   => ( is => 'ro' , isa => 'Str'     , required => 1 );
+has status   => ( is => 'ro' , isa => 'Str'     , required => 1 );
+has success  => ( is => 'ro' , isa => 'Bool'    , required => 1 );
 
-  return @_ if ( @_ > 1 );
-
-  return $_[0] if ref $_[0];
-
-  return decode_json $_[0];
-}
+has decoded_content => (
+  is         => 'ro' ,
+  isa        => 'HashRef' ,
+  lazy_build => 1 ,
+);
+# FIXME this needs to deal with situation where content isn't actually JSON...
+sub _build_decoded_content { return decode_json shift->content }
 
 __PACKAGE__->meta->make_immutable;
 1;
