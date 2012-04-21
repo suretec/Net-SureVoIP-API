@@ -77,6 +77,10 @@ with 'Role::REST::Client' => {
     #   create_customer => {
     #     method => 'POST' ,
     #   },
+    echo => {
+      path   => 'support/echo',
+      method => 'POST' ,
+    },
     #    list_calls => {},
     list_invoices => {
       path => 'customers/%{key}s/billing/invoices' ,

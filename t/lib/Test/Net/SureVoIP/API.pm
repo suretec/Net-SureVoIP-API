@@ -3,6 +3,7 @@ use parent 'Test::BASE';
 use strict;
 use warnings;
 
+use JSON;
 use Net::SureVoIP::API;
 
 use Test::Most;
@@ -63,6 +64,19 @@ sub customer_number :Tests() {
 
     ok(1);
   }
+}
+
+sub echo :Tests() {
+  my $test = shift;
+
+  my $content = to_json({ foo => 'bar' });
+
+  my $resp = $test->{api}->echo( $content );
+
+  isa_ok( $resp , 'Net::SureVoIP::API::Response' );
+
+  is( $resp->success , 1 , 'request worked' );
+
 }
 
 sub ip_address :Tests(1) {
