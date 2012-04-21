@@ -17,6 +17,7 @@ sub fixtures :Tests(startup => 2) {
   ### variables for user/pass are properly set.
 
   $test->{api} = Net::SureVoIP::API->new({
+    debug      => $ENV{SUREVOIP_API_DEBUG} // 0,
     basic_auth => {
       username => $ENV{SUREVOIP_USER} ,
       password => $ENV{SUREVOIP_PASS} ,
