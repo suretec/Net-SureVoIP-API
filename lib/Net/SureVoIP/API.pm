@@ -10,6 +10,8 @@ use Net::SureVoIP::API::Response::Customer;
 
 =attr base_url
 
+### FIXME POD
+
 =cut
 
 has base_url => (
@@ -40,6 +42,8 @@ has debug => (
 
 =attr default_headers
 
+### FIXME POD
+
 =cut
 
 has default_headers => (
@@ -60,6 +64,8 @@ has default_response_handler => (
 );
 
 =attr partner_name
+
+### FIXME POD
 
 =cut
 
@@ -138,11 +144,11 @@ sub BUILDARGS {
 
   ### FIXME
   if ( $args{basic_auth} ) {
-    my $user = $args{basic_auth}{username}
-      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs username' );
+    my $user = $args{basic_auth}{username} //
+      Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs username' );
 
-    my $pass = $args{basic_auth}{password}
-      // Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs password' );
+    my $pass = $args{basic_auth}{password} //
+      Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs password' );
 
     $args{default_headers}{Authorization} = 'Basic ' . encode_base64("$user:$pass");
   }

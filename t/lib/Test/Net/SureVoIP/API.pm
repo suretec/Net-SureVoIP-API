@@ -46,7 +46,7 @@ sub customer :Tests() {
  TODO: {
     local $TODO = 'Need to pass key to customer method. Also need to make lack of required option fatal.';
 
-    my $customer = $test->{api}->customer;
+    my $customer = $test->{api}->customer({ key => 'foo' });
 
     isa_ok( $customer , 'Net::SureVoIP::API::Response::Customer' );
     is( $customer->status , 200 , 'success' );
