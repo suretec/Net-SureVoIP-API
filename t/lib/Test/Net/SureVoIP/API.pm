@@ -102,7 +102,17 @@ sub service_status :Tests() {
 
   my $resp = $test->{api}->service_status;
 
-  like( $resp->{content} , qr/"entries":/ , 'has entries' );
+  isa_ok( $resp , 'Net::SureVoIP::API::Response::ServiceStatus' );
+
+  my $entries = $resp->entries;
+
+  foreach ( @$entries ) {
+    isa_ok( $_ , 'Net::SureVoIP::API::Response::ServiceStatus::Entry' );
+  }
+
+  ok( $resp->feed_title , 'has feed title' );
+  ok( $resp->headers , 'has headers' );
+
 }
 
 1;

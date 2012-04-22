@@ -122,7 +122,8 @@ with 'Role::REST::Client' => {
       path => 'support/ip-address' ,
     },
     service_status => {
-      path => 'support/service-status' ,
+      path     => 'support/service-status' ,
+      response => 'Net::SureVoIP::API::Response::ServiceStatus' ,
     },
     #    sip => {} ,
     #    numbers => {} ,
