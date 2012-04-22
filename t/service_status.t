@@ -1,9 +1,11 @@
 #! perl
+use lib 't/lib';
 
-use Test::Most             qw/ !blessed /;
+use namespace::autoclean;
+
+use Test::More;
 use Test::Routine;
 use Test::Routine::Util;
-use namespace::autoclean;
 
 with 'Fixture::Client';
 

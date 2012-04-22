@@ -1,5 +1,7 @@
 package Fixture::Client;
 
+use namespace::autoclean;
+
 use Test::Routine;
 use Test::More;
 

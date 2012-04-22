@@ -1,4 +1,5 @@
 package Net::SureVoIP::API::Exception;
+# ABSTRACT: Throwable::X-based exception base class
 use Moose;
 with 'Throwable::X';
 

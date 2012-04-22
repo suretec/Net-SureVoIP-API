@@ -1,9 +1,11 @@
 #! perl
+use lib 't/lib';
+
+use namespace::autoclean;
 
 use Test::Most             qw/ !blessed /;
 use Test::Routine;
 use Test::Routine::Util;
-use namespace::autoclean;
 
 use Net::SureVoIP::API;
 

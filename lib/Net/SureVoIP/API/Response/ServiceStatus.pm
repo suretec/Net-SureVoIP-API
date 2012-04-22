@@ -1,5 +1,5 @@
 package Net::SureVoIP::API::Response::ServiceStatus;
-
+# ABSTRACT: Response from the support/service_status API endpoint
 use Moose;
 extends 'Net::SureVoIP::API::Response';
 

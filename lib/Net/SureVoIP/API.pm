@@ -75,66 +75,88 @@ has partner_name => (
   predicate => 'has_partner_name' ,
 );
 
-# load this down here because some required methods are satisfied by
-# attribute accessors and we have to generate them first...
 with 'Role::REST::Client' => {
+  ### FIXME need to fill in the rest of this
   commands => {
-    ### FIXME need to fill in the rest of this
-    #   create_customer => {
-    #     method => 'POST' ,
-    #   },
+    # FIXME RT#54644
+    create_customer => {
+      path   => 'customers',
+      method => 'POST' ,
+    },
+
+    # FIXME need to finish tests -- dependent on mocks
+    customer => {
+      path     => 'customers/%{account}s' ,
+      response => 'Net::SureVoIP::API::Response::Customer' ,
+    },
+
+    # FIXME waiting on production deployment - test should start passing then
     echo => {
       path   => 'support/echo',
       method => 'POST' ,
     },
-    #    list_calls => {},
-    list_invoices => {
-      path => 'customers/%{key}s/billing/invoices' ,
-    },
-    #    get_invoice => {
-    #      path  => 'customers/%{key}s/billing/invoices/%{id}s' ,
-    #      alias => 'invoice_details'
-    #    },
-    #    show_billing_contact => {
-    #      path => 'customers/%{key}s/billing/contact' ,
-    #    } ,
-    #    update_billing_contact => {
-    #      path => 'customers/%{key}s/billing/contact' ,
-    #    } ,
-    #    list_numbers => {} ,
-    #    get_number => {
-    #      alias => 'number_details' ,
-    #    },
-    #    update_number => {} ,
-    #    list_faxes => {} ,
-    #    get_fax => {
-    #      alias => 'fax_details' ,
-    #    },
-    #    list_sms => {} ,
-    #    get_sms => {
-    #      alias => 'sms_details' ,
-    #    },
-    customer => {
-      path     => 'customers/%{key}s' ,
-      response => 'Net::SureVoIP::API::Response::Customer' ,
-    },
+
+    # FIXME need to finalize response object
     ip_address => {
       path => 'support/ip-address' ,
     },
+
+    # FIXME RT#54647
+    list_calls => {
+      path   => 'customers/%{account}s/calls' ,
+      method => 'GET',
+    },
+
+    # FIXME RT#54646
+    list_invoices => {
+      path => 'customers/%{account}s/billing/invoices' ,
+    },
+
+    # FIXME RT#54645
+    list_numbers => {
+      path => 'customers/%{account}s/numbers' ,
+    } ,
+
     service_status => {
       path     => 'support/service-status' ,
       response => 'Net::SureVoIP::API::Response::ServiceStatus' ,
     },
-    #    sip => {} ,
-    #    numbers => {} ,
-    #    area_codes => {} ,
-    #    create_call => {} ,
-    #    end_call => {} ,
-    #    modify_call => {} ,
-    #    list_customer_stats => {} ,
-    #    get_customer_stats => {} ,
-    #    send_sms => {} ,
-    #    send_fax => {} ,
+
+    # FIXME finish test, response
+    show_billing_contact => {
+      path => 'customers/%{key}s/billing/contact' ,
+    } ,
+
+    # FIXME everything below has not been implemented yet
+    # area_codes => {} ,
+    # create_call => {} ,
+    # end_call => {} ,
+    # get_customer_stats => {} ,
+    # get_fax => {
+    #   alias => 'fax_details' ,
+    # },
+    # get_invoice => {
+    #   path  => 'customers/%{key}s/billing/invoices/%{id}s' ,
+    #   alias => 'invoice_details'
+    # },
+    # get_number => {
+    #   alias => 'number_details' ,
+    # },
+    # get_sms => {
+    #   alias => 'sms_details' ,
+    # },
+    # list_customer_stats => {} ,
+    # list_faxes => {} ,
+    # list_sms => {} ,
+    # modify_call => {} ,
+    # numbers => {} ,
+    # send_fax => {} ,
+    # send_sms => {} ,
+    # sip => {} ,
+    # update_billing_contact => {
+    #   path => 'customers/%{key}s/billing/contact' ,
+    # } ,
+    # update_number => {} ,
   },
 };
 

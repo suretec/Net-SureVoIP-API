@@ -1,4 +1,5 @@
 package Net::SureVoIP::API::Response;
+# ABSTRACT: Base class for HTTP responses from the SureVoIP API
 use Moose;
 
 use JSON;

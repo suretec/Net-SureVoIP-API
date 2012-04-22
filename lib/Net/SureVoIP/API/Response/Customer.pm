@@ -1,4 +1,5 @@
 package Net::SureVoIP::API::Response::Customer;
+# ABSTRACT: Response for the 'show_customer' API endpoint
 use Moose;
 extends 'Net::SureVoIP::API::Response';
 
