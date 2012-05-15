@@ -10,6 +10,7 @@ has protocol => ( is => 'ro' , isa => 'Str'     , required => 1 );
 has reason   => ( is => 'ro' , isa => 'Str'     , required => 1 );
 has status   => ( is => 'ro' , isa => 'Str'     , required => 1 );
 has success  => ( is => 'ro' , isa => 'Bool'    , required => 1 );
+has url      => ( is => 'ro' , isa => 'Str'     , required => 1 );
 
 has decoded_content => (
   is         => 'ro' ,
