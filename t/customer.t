@@ -12,11 +12,11 @@ with 'Fixture::Client';
 test 'customer endpoint' => sub {
   my $self = shift;
 
- TODO: {
-    local $TODO = 'Need to pass account number to customer method.';
+ SKIP: {
+    skip 'no SUREVOIP_ACCOUNT in env' , 2 unless $ENV{SUREVOIP_ACCOUNT};
 
     my $customer = $self->client->customer({
-      # account => 'FIXME need account number' ,
+      account => $ENV{SUREVOIP_ACCOUNT}
     });
 
     isa_ok( $customer , 'Net::SureVoIP::API::Response::Customer' );
