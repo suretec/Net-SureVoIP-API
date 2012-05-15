@@ -173,7 +173,10 @@ sub BUILDARGS {
     my $pass = $args{basic_auth}{password} //
       Net::SureVoIP::API::Exception::Init->throw( 'basic_auth needs password' );
 
-    $args{default_headers}{Authorization} = 'Basic ' . encode_base64("$user:$pass");
+    my $auth = encode_base64("$user:$pass");
+    chomp $auth;
+
+    $args{default_headers}{Authorization} = "Basic $auth";
   }
   ### TODO OAuth....
   # elsif ( $args{oauth} ) { ... }
