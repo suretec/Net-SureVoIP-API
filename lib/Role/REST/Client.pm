@@ -200,7 +200,7 @@ role {
 
       my $response = $self->$method( $url , $args );
 
-      if ( $self->can('debug') and $self->debug and defined $ENV{SUREVOIP_API_DUMP} ) {
+      if ( $self->can('debug') and $self->debug and defined $ENV{ROLE_REST_CLIENT_DUMP} ) {
         open( my $dump , '>>' , $ENV{ROLE_REST_CLIENT_DUMP} ) or die $!;
         print $dump Dumper $response;
         close( $dump );
