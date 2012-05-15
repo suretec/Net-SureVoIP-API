@@ -9,6 +9,7 @@ use warnings;
 
 use Class::Load       qw/ :all /;
 use Data::Dumper;
+use JSON;
 use List::MoreUtils   qw/ uniq /;
 
 =head1 SYNOPSIS
@@ -171,7 +172,8 @@ role {
     method $command => sub {
       my( $self , $args ) = ( @_ , {} );
 
-      ref $args or $args = { content => $args };
+      $args->{content} = to_json $args->{content}
+        if ref $args->{content};
 
       $args = { %{ $command_opts->{args}{default} } , %$args };
 
